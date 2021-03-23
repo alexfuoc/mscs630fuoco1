@@ -6,15 +6,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import labs.AESCipher;
 import org.junit.jupiter.api.Test;
+
 
 public class Driver_lab4Test {
     String error = "An error occurred.";
     
     @Test
     void test1() {
-        File input1 = new File("./bin/lab4data/input.4.1.in");
-        File output1 = new File("./bin/lab4data/input.4.1.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.1.in");
+        File output1 = new File("src/test/java/lab4data/input.4.1.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -35,8 +37,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test2() {
-        File input1 = new File("./bin/lab4data/input.4.2.in");
-        File output1 = new File("./bin/lab4data/input.4.2.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.2.in");
+        File output1 = new File("src/test/java/lab4data/input.4.2.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -57,8 +59,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test3() {
-        File input1 = new File("./bin/lab4data/input.4.3.in");
-        File output1 = new File("./bin/lab4data/input.4.3.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.3.in");
+        File output1 = new File("src/test/java/lab4data/input.4.3.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -79,8 +81,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test4() {
-        File input1 = new File("./bin/lab4data/input.4.4.in");
-        File output1 = new File("./bin/lab4data/input.4.4.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.4.in");
+        File output1 = new File("src/test/java/lab4data/input.4.4.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -101,8 +103,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test5() {
-        File input1 = new File("./bin/lab4data/input.4.5.in");
-        File output1 = new File("./bin/lab4data/input.4.5.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.5.in");
+        File output1 = new File("src/test/java/lab4data/input.4.5.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -123,8 +125,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test6() {
-        File input1 = new File("./bin/lab4data/input.4.6.in");
-        File output1 = new File("./bin/lab4data/input.4.6.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.6.in");
+        File output1 = new File("src/test/java/lab4data/input.4.6.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -145,8 +147,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test7() {
-        File input1 = new File("./bin/lab4data/input.4.7.in");
-        File output1 = new File("./bin/lab4data/input.4.7.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.7.in");
+        File output1 = new File("src/test/java/lab4data/input.4.7.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -167,8 +169,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test8() {
-        File input1 = new File("./bin/lab4data/input.4.8.in");
-        File output1 = new File("./bin/lab4data/input.4.8.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.8.in");
+        File output1 = new File("src/test/java/lab4data/input.4.8.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -189,8 +191,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test9() {
-        File input1 = new File("./bin/lab4data/input.4.9.in");
-        File output1 = new File("./bin/lab4data/input.4.9.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.9.in");
+        File output1 = new File("src/test/java/lab4data/input.4.9.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);
@@ -211,8 +213,8 @@ public class Driver_lab4Test {
     }
     @Test
     void test10() {
-        File input1 = new File("./bin/lab4data/input.4.10.in");
-        File output1 = new File("./bin/lab4data/input.4.10.ans");
+        File input1 = new File("src/test/java/lab4data/input.4.10.in");
+        File output1 = new File("src/test/java/lab4data/input.4.10.ans");
 
         try (
             Scanner inputReader1 = new Scanner(input1);

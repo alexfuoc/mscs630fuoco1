@@ -1,10 +1,20 @@
 package labs;
+/*
+  AESCipher.java
+  Alex Fuoco
+  MSCS 630
+  Lab 4
+  March 21, 2021
+  version: 1.0
 
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
+  This file contains the AESCipher class.
+ */
 
+/**
+ * This class contains the methods for creating the KeyRoundsHex from the Lab 4.
+ */
 public class AESCipher {
-    private final int[] S_BOX =
+    private static final int[] S_BOX =
             {0x63 ,0x7c ,0x77 ,0x7b ,0xf2 ,0x6b ,0x6f ,0xc5 ,0x30 ,0x01 ,0x67 ,0x2b ,0xfe ,0xd7 ,0xab ,0x76
                     ,0xca ,0x82 ,0xc9 ,0x7d ,0xfa ,0x59 ,0x47 ,0xf0 ,0xad ,0xd4 ,0xa2 ,0xaf ,0x9c ,0xa4 ,0x72 ,0xc0
                     ,0xb7 ,0xfd ,0x93 ,0x26 ,0x36 ,0x3f ,0xf7 ,0xcc ,0x34 ,0xa5 ,0xe5 ,0xf1 ,0x71 ,0xd8 ,0x31 ,0x15
@@ -22,7 +32,7 @@ public class AESCipher {
                     ,0xe1 ,0xf8 ,0x98 ,0x11 ,0x69 ,0xd9 ,0x8e ,0x94 ,0x9b ,0x1e ,0x87 ,0xe9 ,0xce ,0x55 ,0x28 ,0xdf
                     ,0x8c ,0xa1 ,0x89 ,0x0d ,0xbf ,0xe6 ,0x42 ,0x68 ,0x41 ,0x99 ,0x2d ,0x0f ,0xb0 ,0x54 ,0xbb ,0x16};
 
-    private final int[] R_CON = {
+    private static final int[] R_CON = {
             0x8D,0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36,0x6C,0xD8,0xAB,0x4D,0x9A,
             0x2F,0x5E,0xBC,0x63,0xC6,0x97,0x35,0x6A,0xD4,0xB3,0x7D,0xFA,0xEF,0xC5,0x91,0x39,
             0x72,0xE4,0xD3,0xBD,0x61,0xC2,0x9F,0x25,0x4A,0x94,0x33,0x66,0xCC,0x83,0x1D,0x3A,
@@ -40,65 +50,214 @@ public class AESCipher {
             0xC6,0x97,0x35,0x6A,0xD4,0xB3,0x7D,0xFA,0xEF,0xC5,0x91,0x39,0x72,0xE4,0xD3,0xBD,
             0x61,0xC2,0x9F,0x25,0x4A,0x94,0x33,0x66,0xCC,0x83,0x1D,0x3A,0x74,0xE8,0xCB,0x8D};
 
-    public String inputKey = "5468617473206D79204B756E67204675";
 
     public static void main(String[] args) {
-        String inputKey = "5468617473206D79204B756E67204675";
-        String[] roundKeysHex = aesRoundKeys(inputKey);
     }
 
     /**
-     *
-     * @param KeyHex the key
-     * @return returns the 11 row string containing each round of keys produced
+     * Takes in the starting string KeyHex, and returns the keyRoundsHex, giving the 11 rounds of keys
+     * @param KeyHex the key as a HexString
+     * @return returns the 11 row HexString containing each round of keys produced
      */
     public static String[] aesRoundKeys(String KeyHex) {
-        String[][] keyMap = new String[11][1];
-        byte[][] keys = new byte[44][4];
-        int[] stringInput = new int[16];
+        String[] roundKeyHex;
+        int[][] keys = new int[48][4];
+
 
         int len = KeyHex.length();
         int[] data = new int[len / 2];
 
+        //Parsing KeyHex and inputting first ket into keys matrix
         for (int i = 0; i < len; i += 2) {
-            String temp = String.valueOf(KeyHex.charAt(i)).concat(String.valueOf(KeyHex.charAt(i+1))).toLowerCase();
-            System.out.print("Input String Keys: ");
-            System.out.print(temp);
+            String temp1 = String.valueOf(KeyHex.charAt(i));
+            String temp2 = String.valueOf(KeyHex.charAt(i+1));
+            String temp = temp1.concat(temp2);
+//            System.out.print("Input String Keys: ");
+//            System.out.print(temp1 + ", " + temp2);
+
             data[i / 2] = Integer.parseInt(temp, 16);
-            System.out.print(", Output Int Keys: ");
-            System.out.print(data[i/2]);
+//            System.out.print(", Output Int Keys: ");
+//            System.out.print(data[i / 2]);
+        }
+
+
+
+        // Adding the initial string as int in the keys array
+        for (int i = 0; i < 4; i++){
+            keys[i] = new int[]{data[4 * i], data[4 * i + 1], data[4 * i + 2], data[4 * i + 3]};
+        }
+
+        //adding 4-48
+        for (int i = 4; i < keys.length; i++) {
+            int[] temp = keys[i - 1];
+
+            //Every 4th word, do this
+            if (i % 4 == 0) {
+                temp = rotWord(temp); //First, shift bytes left one
+                temp = subWord(temp); //Second, do a subword with the S_BOX
+                temp[0] = aesRCON(temp[0], i); //Third, XOR the first element with the Round Constant
+            }
+
+            // XOR the word[i-4] with the temp word we created
+            for (int j = 0; j < temp.length; j++) {
+                keys[i][j] = keys[i - 4][j] ^ temp[j];
+            }
+
+        }
+
+//        printWMatrix(keys);
+        roundKeyHex = formatKeyMatrix(keys);
+
+        return roundKeyHex;
+    }
+
+    /**
+     * RotWord performs a one-byte circular left shift on a word.
+     * Takes an input word [B0, B1, B2, B3] is transformed into [B1, B2, B3, B0].
+     * @param word an array of ints, representing hex bytes
+     * @return the array shifted one byte to the left
+     */
+    public static int[] rotWord(int[] word){
+        int swap = word[0];
+        int[] rotWord = new int[word.length];
+
+        for(int i = 0; i < word.length; i++){
+            if(i == word.length - 1){
+                rotWord[i] = swap;
+            }else {
+                rotWord[i] = word[i+1];
+            }
+        }
+
+        return rotWord;
+    }
+
+    /**
+     * SubWord performs a byte substitution on each byte using the S_BOX.
+     * @param word an array of ints, representing hex bytes
+     * @return the word substitued with each byte using the S_BOX
+     */
+    public static int[] subWord(int[] word){
+        int[] subWord = new int[word.length];
+
+
+        for(int i = 0; i < word.length; i++){
+            String hexByte = Integer.toHexString(word[i]);
+//            System.out.println("OUTSIDE THE SBOX SWAP, HEX BYTE IN SUBWORD: " + hexByte);
+            int sboxSwap = aesSBOX(hexByte);
+            subWord[i] = sboxSwap;
+        }
+
+        return subWord;
+    }
+
+    /**
+     * Translates a byte by into the S_BOX equivalent
+     * @param inHex HEX string to be transformed using S_BOX
+     * @return outHex the substituted byte as a integer represented hex
+     */
+    public static int aesSBOX(String inHex){
+//        System.out.println("INSIDE THE SBOX SWAP");
+        int hex1;
+        int hex2;
+        if(inHex.length() == 1) { // pad the byte with a zero
+            hex1 = 0;
+            hex2 = Integer.parseInt(String.valueOf(inHex.charAt(0)), 16);
+        } else {
+            hex1 = Integer.parseInt(String.valueOf(inHex.charAt(0)), 16);
+            hex2 = Integer.parseInt(String.valueOf(inHex.charAt(1)), 16);
+        }
+
+        int outHex = S_BOX[(hex1 * 16) + hex2];
+//        System.out.print("HEXBYTE IN: " + inHex + ", ");
+//        System.out.print("HEXBYTE OUT: " + outHex + ", ");
+//        String outHexString = Integer.toHexString(outHex);
+//        System.out.print("CONVERTED SWAPPED HEXBYTE: " + outHexString);
+//        System.out.println();
+        return outHex;
+    }
+
+    /**
+     * XORed with a round constant, Rcon[j], where j is the round.
+     * @param inHex the byte to be XORed with the round constant
+     * @param round the round of the key
+     * @return the resulting byte
+     */
+    private static int aesRCON(int inHex, int round){
+        int RCON = R_CON[round/4];
+
+        return inHex ^ RCON;
+    }
+
+    /**
+     * Prints the W matrix, by integer representation, hexstring equivalent and the resulting word as a HexString
+     * @param words the words matrix to be printed
+     */
+    public static void printWMatrix(int[][] words) {
+        System.out.println("Printing the W Matrix:");
+
+        for (int[] word : words) {
+            String[] keyOut = new String[4];
+            String keyString = "";
+
+            System.out.print("[ ");
+            for (int j = 0; j < word.length; j++) {
+                int temp = word[j];
+                System.out.print(temp);
+                if (j != 3) {
+                    System.out.print(", ");
+                }
+                keyOut[j] = Integer.toHexString(temp);
+                if (keyOut[j].length() == 1) { // pad the byte with a zero
+                    keyOut[j] = "0".concat(keyOut[j]);
+                }
+                keyString = keyString.concat(keyOut[j]).toUpperCase();
+            }
+            System.out.print("]");
+            System.out.println();
+            System.out.print("[ ");
+
+            for (int j = 0; j < keyOut.length; j++) {
+                System.out.print(keyOut[j]);
+                if (j != 3) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.print("]");
+            System.out.println();
+            System.out.print(keyString);
             System.out.println();
         }
+    }
 
-        System.out.println(KeyHex.length());
+    /**
+     * Taking the int[][] words matrix and formatting it into the roundKeyHex String[]
+     * @param words the integer words matrix to be formatted
+     * @return the formatted string array
+     */
+    public static String[] formatKeyMatrix(int[][] words) {
+        System.out.println("Formatting the final key strings:");
+        String[] outKeyString = new String[11];
+        String keyString = "";
 
-        for(int i = 0; i < KeyHex.length(); i+=2) {
-            stringInput[i / 2] = (KeyHex.charAt(i) + KeyHex.charAt(i + 1));
-            System.out.print("Input Keys: ");
-            System.out.print(KeyHex.charAt(i) + "" + KeyHex.charAt(i + 1));
-            System.out.print(" Output: ");
-            System.out.print(stringInput[i/2]);
-            System.out.println();
+        for (int i = 0; i < words.length; i++) {
+            if( i % 4 == 0 && i != 0){
+                System.out.println(keyString);
+                outKeyString[(i/4)-1] = keyString;
+                keyString = "";
+            }
+
+            for (int j = 0; j < words[i].length; j++) {
+                String temp = Integer.toHexString(words[i][j]);
+                if(temp.length() == 1) { // pad the byte with a zero
+                    temp = "0".concat(temp);
+                }
+                keyString = keyString.concat(temp).toUpperCase();
+            }
+
         }
-        keyMap[0][0] = KeyHex;
+        System.out.println();
 
-
-        byte[] keysInput = KeyHex.getBytes();
-
-        for(byte key: keysInput){
-            System.out.println(key);
-        }
-
-//        for (int i = 0; i < 4; i++){
-//            keys[i] = new bytekeysInput[4*i], keysInput[4*i+1], keysInput[4*i+2], keysInput[4*i+3]];
-//
-//        }
-
-        String temp;
-//        for (int i = 0; i < 4; i++){
-//
-//        }
-
-        return new String[] {"bitch", "hoe"};
+        return outKeyString;
     }
 }
