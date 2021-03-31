@@ -10,5 +10,7 @@ labs/Driver_lab4.java
  labs.Driver_lab4
 labs/Driver_lab3b.java
  labs.Driver_lab3b
+labs/Driver_lab5.java
+ labs.Driver_lab5
 labs/AESCipher.java
  labs.AESCipher

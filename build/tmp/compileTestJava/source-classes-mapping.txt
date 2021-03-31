@@ -8,6 +8,8 @@ Driver_lab2aTest.java
  Driver_lab2aTest
 Driver_lab3aTest.java
  Driver_lab3aTest
+Driver_lab5Test.java
+ Driver_lab5Test
 Lab04_Test.java
  Lab04_Test
 Driver_lab4Test.java
